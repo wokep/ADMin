@@ -1,5 +1,5 @@
 -- 🐼 PANDA CLIFFY V20 | SUPREME ROBLOX GUI 🚀🔥
--- Features: Aimbot, ESP, Fly, Speed Walk, Jump Hacks organized into tabs
+-- Features: Silent Aim, ESP, Fly, Speed Walk, Jump Hacks
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -44,7 +44,7 @@ CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.TextSize = 18
 CloseButton.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
+    MainFrame.Visible = false
 end)
 
 -- TABS
@@ -54,102 +54,117 @@ local TabFrames = {}
 
 -- Create Tab Buttons
 for i, tabName in ipairs(Tabs) do
-	local TabButton = Instance.new("TextButton", MainFrame)
-	TabButton.Size = UDim2.new(0, 90, 0, 30)
-	TabButton.Position = UDim2.new(0, (i-1)*90, 0, 30)
-	TabButton.Text = tabName
-	TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TabButton.Font = Enum.Font.GothamBold
-	TabButton.TextSize = 16
-	TabButtons[tabName] = TabButton
+    local TabButton = Instance.new("TextButton", MainFrame)
+    TabButton.Size = UDim2.new(0, 90, 0, 30)
+    TabButton.Position = UDim2.new(0, (i-1)*90, 0, 30)
+    TabButton.Text = tabName
+    TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.Font = Enum.Font.GothamBold
+    TabButton.TextSize = 16
+    TabButtons[tabName] = TabButton
 
-	local TabFrame = Instance.new("Frame", MainFrame)
-	TabFrame.Size = UDim2.new(1, 0, 1, -60)
-	TabFrame.Position = UDim2.new(0, 0, 0, 60)
-	TabFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	TabFrame.Visible = false
-	TabFrames[tabName] = TabFrame
+    local TabFrame = Instance.new("Frame", MainFrame)
+    TabFrame.Size = UDim2.new(1, 0, 1, -60)
+    TabFrame.Position = UDim2.new(0, 0, 0, 60)
+    TabFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    TabFrame.Visible = false
+    TabFrames[tabName] = TabFrame
 
-	TabButton.MouseButton1Click:Connect(function()
-		-- Hide all tab frames
-		for _, frame in pairs(TabFrames) do
-			frame.Visible = false
-		end
-		-- Show selected tab frame
-		TabFrame.Visible = true
-	end)
+    TabButton.MouseButton1Click:Connect(function()
+        -- Hide all tab frames
+        for _, frame in pairs(TabFrames) do
+            frame.Visible = false
+        end
+        -- Show selected tab frame
+        TabFrame.Visible = true
+    end)
 end
 
 -- Function to add UI elements to each tab
 local function addFeatureToTab(tabName, featureName, featureCallback)
-	local FeatureButton = Instance.new("TextButton", TabFrames[tabName])
-	FeatureButton.Size = UDim2.new(0, 400, 0, 30)
-	FeatureButton.Position = UDim2.new(0, 25, 0, (#TabFrames[tabName]:GetChildren() + 1) * 35)
-	FeatureButton.Text = featureName
-	FeatureButton.Font = Enum.Font.GothamBold
-	FeatureButton.TextSize = 18
-	FeatureButton.MouseButton1Click:Connect(featureCallback)
+    local FeatureButton = Instance.new("TextButton", TabFrames[tabName])
+    FeatureButton.Size = UDim2.new(0, 400, 0, 30)
+    FeatureButton.Position = UDim2.new(0, 25, 0, (#TabFrames[tabName]:GetChildren() + 1) * 35)
+    FeatureButton.Text = featureName
+    FeatureButton.Font = Enum.Font.GothamBold
+    FeatureButton.TextSize = 18
+    FeatureButton.MouseButton1Click:Connect(featureCallback)
 end
 
--- AIMBOT
+-- Silent Aim
 local AimbotEnabled = false
 local function toggleAimbot()
-	AimbotEnabled = not AimbotEnabled
+    AimbotEnabled = not AimbotEnabled
 end
 
-addFeatureToTab("Aimbot", "✅ Aimbot [Toggle]", toggleAimbot)
+addFeatureToTab("Aimbot", "✅ Silent Aim [Toggle]", toggleAimbot)
 
 local function aimAtClosestPlayer()
-	local closestPlayer = nil
-	local shortestDistance = math.huge
-	-- Find closest NPC or player
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-			local distance = (player.Character.Head.Position - Camera.CFrame.Position).Magnitude
-			if distance < shortestDistance then
-				shortestDistance = distance
-				closestPlayer = player
-			end
-		end
-	end
-	-- Aim at target
-	if closestPlayer then
-		local targetPosition = closestPlayer.Character.Head.Position
-		-- Aim at target position with smoothing
-		Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
-	end
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    -- Find closest NPC or player
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+            local distance = (player.Character.Head.Position - Camera.CFrame.Position).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = player
+            end
+        end
+    end
+    -- Aim at target (Silent Aim)
+    if closestPlayer then
+        local targetPosition = closestPlayer.Character.Head.Position
+        local ray = Ray.new(Camera.CFrame.Position, (targetPosition - Camera.CFrame.Position).unit * 999)
+        local hitPart, hitPosition = workspace:FindPartOnRay(ray, LocalPlayer.Character)
+
+        -- Silent Aim logic - move the camera's view without visibly rotating
+        if hitPart and hitPart.Parent and hitPart.Parent:FindFirstChild("Humanoid") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, hitPosition)
+        end
+    end
 end
 
 RunService.RenderStepped:Connect(function()
-	if AimbotEnabled then
-		aimAtClosestPlayer()
-	end
+    if AimbotEnabled then
+        aimAtClosestPlayer()
+    end
 end)
 
--- ESP
+-- ESP (Outline)
 local function createESP(player)
-	if player.Character and player.Character:FindFirstChild("Head") then
-		local character = player.Character
-		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if player.Character and player.Character:FindFirstChild("Head") then
+        local character = player.Character
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 
-		-- Create outline
-		local outline = Instance.new("Highlight")
-		outline.Parent = character
-		outline.FillTransparency = 0.5
-		outline.OutlineTransparency = 0
-		outline.OutlineColor = Color3.fromRGB(255, 0, 0)
-	end
+        -- Create ESP Outline
+        local outline = Instance.new("Highlight")
+        outline.Parent = character
+        outline.FillTransparency = 0.5
+        outline.OutlineTransparency = 0
+        outline.OutlineColor = Color3.fromRGB(255, 0, 0)
+    end
 end
 
 local ESPEnabled = false
 local function toggleESP()
-	ESPEnabled = not ESPEnabled
-	if ESPEnabled then
-		for _, player in pairs(Players:GetPlayers()) do
-			createESP(player)
-		end
-	end
+    ESPEnabled = not ESPEnabled
+    if ESPEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            createESP(player)
+        end
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character then
+                local character = player.Character
+                local highlight = character:FindFirstChildOfClass("Highlight")
+                if highlight then
+                    highlight:Destroy()
+                end
+            end
+        end
+    end
 end
 
 addFeatureToTab("ESP", "✅ ESP [Toggle]", toggleESP)
@@ -158,20 +173,20 @@ addFeatureToTab("ESP", "✅ ESP [Toggle]", toggleESP)
 local Flying = false
 local BodyVelocity
 local function toggleFly()
-	Flying = not Flying
-	if Flying then
-		-- Start flying
-		BodyVelocity = Instance.new("BodyVelocity")
-		BodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-		BodyVelocity.Velocity = Vector3.new(0, 50, 0)
-		BodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
-	else
-		-- Stop flying
-		if BodyVelocity then
-			BodyVelocity:Destroy()
-			BodyVelocity = nil
-		end
-	end
+    Flying = not Flying
+    if Flying then
+        -- Start flying
+        BodyVelocity = Instance.new("BodyVelocity")
+        BodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        BodyVelocity.Velocity = Vector3.new(0, 50, 0)
+        BodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
+    else
+        -- Stop flying
+        if BodyVelocity then
+            BodyVelocity:Destroy()
+            BodyVelocity = nil
+        end
+    end
 end
 
 addFeatureToTab("Fly", "🕊️ Fly Mode [Toggle]", toggleFly)
@@ -179,14 +194,14 @@ addFeatureToTab("Fly", "🕊️ Fly Mode [Toggle]", toggleFly)
 -- Speed Walk
 local SpeedHack = false
 local function toggleSpeedWalk()
-	SpeedHack = not SpeedHack
-	if SpeedHack then
-		-- Speed hack on
-		LocalPlayer.Character.Humanoid.WalkSpeed = 100
-	else
-		-- Speed hack off
-		LocalPlayer.Character.Humanoid.WalkSpeed = 16
-	end
+    SpeedHack = not SpeedHack
+    if SpeedHack then
+        -- Speed hack on
+        LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    else
+        -- Speed hack off
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
 end
 
 addFeatureToTab("SpeedWalk", "⚡ Speed Walk [Toggle]", toggleSpeedWalk)
@@ -194,14 +209,14 @@ addFeatureToTab("SpeedWalk", "⚡ Speed Walk [Toggle]", toggleSpeedWalk)
 -- Jump Hacks
 local JumpHack = false
 local function toggleJumpHack()
-	JumpHack = not JumpHack
-	if JumpHack then
-		-- Jump hack on
-		LocalPlayer.Character.Humanoid.JumpHeight = 100
-	else
-		-- Jump hack off
-		LocalPlayer.Character.Humanoid.JumpHeight = 50
-	end
+    JumpHack = not JumpHack
+    if JumpHack then
+        -- Jump hack on
+        LocalPlayer.Character.Humanoid.JumpHeight = 100
+    else
+        -- Jump hack off
+        LocalPlayer.Character.Humanoid.JumpHeight = 50
+    end
 end
 
 addFeatureToTab("Jump", "💥 Jump Hack [Toggle]", toggleJumpHack)
@@ -213,24 +228,24 @@ local dragStart
 local startPos
 
 MainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = MainFrame.Position
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
 end)
 
 MainFrame.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
 end)
 
 MainFrame.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
 end)
 
 -- End of Script
